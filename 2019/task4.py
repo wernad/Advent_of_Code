@@ -2,13 +2,6 @@ from itertools import tee
 import more_itertools
 import copy
 
-'''
-def pairwise(iterable):
-    a, b = tee(iterable)
-    next(b, None)
-    return zip(a, b)
-'''
-
 min_range = 357253
 max_range = 892942
 

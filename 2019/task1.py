@@ -1,4 +1,4 @@
-with open('Day 1/input.txt') as file:
+with open('puzzle_input/input1.txt') as file:
     input = file.read()
     input = input.split()
     input = [int(i) for i in input]
@@ -8,7 +8,7 @@ total = 0
 for i in input:
     total += int(i/3)-2
 
-print(total)
+print('Part 1:', total)
 
 #part 2
 total = 0
@@ -20,4 +20,4 @@ for i in input:
         total += i
         
 
-print(total)
+print('Part 2:', total)

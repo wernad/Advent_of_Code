@@ -1,5 +1,5 @@
 import math 
-with open('Day 6/input.txt') as file:
+with open('puzzle_input/input6.txt') as file:
     program_input = file.read()
     program_input = program_input.split('\n')
     program_input = [x.split(')') for x in program_input]
@@ -73,6 +73,6 @@ paths = find_all_paths(leaves)
 
 count_transfers(obj1, obj2, paths)
 
-print(count_orbits(paths))
+print('Part 1:', count_orbits(paths))
 
-print(count_transfers(obj1, obj2, paths))
+print('Part 2:', count_transfers(obj1, obj2, paths))

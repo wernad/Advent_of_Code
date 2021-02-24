@@ -1,9 +1,8 @@
 import re
 from itertools import tee
 import more_itertools
-import matplotlib.pyplot as plt
 
-with open('Day 3/input.txt') as file:
+with open('puzzle_input/input3.txt') as file:
     program_input = file.read()
     wire1_steps, wire2_steps = program_input.split('\n')
     wire1_steps = [(x[0], int(x[1:])) for x in wire1_steps.replace(',',' ').split()]
@@ -84,5 +83,5 @@ wire1_coords = draw_wire(wire1_steps)
 wire2_coords = draw_wire(wire2_steps)
 
 intersections, distances = find_intersections(wire1_coords, wire2_coords)
-print('Manhattan distance:', find_shortest_md(intersections))
-print('Distance via wire:', min(distances))
+print('Part 1:', find_shortest_md(intersections))
+print('Part 2:', min(distances))
