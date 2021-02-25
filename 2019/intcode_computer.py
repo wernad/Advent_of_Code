@@ -37,37 +37,34 @@ class IntcodeComputer:
         return self.puzzle_input
 
     def process_intcode(self):
+        def __get_param(param_mode, value):
+            if param_mode == 0:
+                return self.puzzle_input[value]
+            return value
+                    
         self.output = []
         i = self.opcode_position
         while True:
             opcode = str(self.puzzle_input[i]).zfill(5)
             param_modes = [int(x) for x in opcode[:-2]]
             opcode = int(opcode[-2:])
-            if opcode in {3, 4, 99}:
+            if opcode == 99:
+                if self.feedback:
+                    return
+                break
+            elif opcode in {3, 4}:
                 self.opcode_position = i
-                self.output = self.input
                 if opcode == 3:
-                    print(self.input)
                     self.puzzle_input[self.puzzle_input[i+1]] = self.input.pop(0) if len(self.input) > 1 else self.input[0]
                 elif opcode == 4:
-                    self.output.append(self.puzzle_input[self.puzzle_input[i+1]])
+                    param_1 = __get_param(param_modes[-1], self.puzzle_input[i+1])
+                    self.output.append(param_1)
                     if self.feedback:
                         return
-                elif opcode == 99:
-                    if self.feedback:
-                        return
-                    break
                 i += 2
             elif opcode in {1, 2, 5, 6, 7, 8}:
-                def __get_param(param_mode, value):
-                    if param_mode == 0:
-                        return self.puzzle_input[value]
-                    return value
-
                 param_1 = __get_param(param_modes[-1], self.puzzle_input[i+1])
                 param_2 = __get_param(param_modes[-2], self.puzzle_input[i+2])
-                param_3 = __get_param(param_modes[-3], self.puzzle_input[i+3])
-
                 if opcode == 1:
                     self.puzzle_input[self.puzzle_input[i+3]] = param_1 + param_2
                 elif opcode == 2:
@@ -79,8 +76,8 @@ class IntcodeComputer:
                     i = param_2 if param_1 == 0 else i+3
                     continue
                 elif opcode == 7:
-                    self.puzzle_input[param_3] = 1 if param_1 < param_2 else 0
+                    self.puzzle_input[self.puzzle_input[i+3]] = 1 if param_1 < param_2 else 0
                 elif opcode == 8:
-                    self.puzzle_input[param_3] = 1 if param_1 == param_2 else 0
+                    self.puzzle_input[self.puzzle_input[i+3]] = 1 if param_1 == param_2 else 0
                 i += 4
         
