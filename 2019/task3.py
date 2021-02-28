@@ -23,10 +23,6 @@ def draw_wire(wire_steps):
         coords.append(new_coord)
     return coords
 
-#determinant
-def det(a, b):
-    return a[0] * b[1] - a[1] * b[0]
-
 def pairwise(iterable):
     a, b = tee(iterable)
     next(b, None)
