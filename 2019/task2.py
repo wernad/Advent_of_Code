@@ -14,8 +14,7 @@ while j < 100:
     puzzle_input[1] = i
     puzzle_input[2] = j
 
-    computer.set_puzzle_input(puzzle_input.copy())
-    computer.set_opcode_position(0)
+    computer.restart(puzzle_input.copy())
     computer.process_intcode()
     if computer.get_puzzle_input()[0] == 19690720:
         break

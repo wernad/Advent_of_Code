@@ -5,8 +5,8 @@ import more_itertools
 with open('puzzle_input/input3.txt') as file:
     program_input = file.read()
     wire1_steps, wire2_steps = program_input.split('\n')
-    wire1_steps = [(x[0], int(x[1:])) for x in wire1_steps.replace(',',' ').split()]
-    wire2_steps = [(x[0], int(x[1:])) for x in wire2_steps.replace(',',' ').split()]
+    wire1_steps = [(x[0], int(x[1:])) for x in wire1_steps.split(',')]
+    wire2_steps = [(x[0], int(x[1:])) for x in wire2_steps.split(',')]
     
 def draw_wire(wire_steps):
     coords = [[[0,0], 0]] #[[x,y], distance]
@@ -48,7 +48,6 @@ def find_intersections(wire1, wire2):
         a1_coords = a1[0]
         a2_coords = a2[0]
         wire1_type = get_line_type(a1_coords,a2_coords)
-        
         
         for b1, b2 in pairwise(wire2):
             b1_coords = b1[0]
