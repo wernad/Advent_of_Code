@@ -1,16 +1,16 @@
 import math 
 with open('puzzle_input/input6.txt') as file:
-    program_input = file.read()
-    program_input = program_input.split('\n')
-    program_input = [x.split(')') for x in program_input]
+    puzzle_input = file.read()
+    puzzle_input = puzzle_input.split('\n')
+    puzzle_input = [x.split(')') for x in puzzle_input]
 
 def find_leaves():
     heads = []
     tails = []
-    for obj in program_input:
+    for obj in puzzle_input:
         if obj[0] not in heads:
             heads.append(obj[0])
-    for obj in program_input:
+    for obj in puzzle_input:
         if obj[1] not in tails:
             tails.append(obj[1])
     return list(set(tails).difference(heads))
@@ -23,7 +23,7 @@ def find_all_paths(leaves):
         path_complete = False
         while not path_complete:
             new_path.insert(0, temp)
-            for obj in program_input:
+            for obj in puzzle_input:
                 if temp == obj[1]:
                     temp = obj[0]
                     break
