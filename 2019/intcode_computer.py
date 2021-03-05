@@ -18,6 +18,7 @@ class IntcodeComputer:
     def restart(self, puzzle_input = None):
         self.puzzle_input = self.puzzle_input_copy.copy() if puzzle_input is None else puzzle_input
         self.opcode_position = 0
+        self.relative_base = 0
         self.input = []
         return self
 
@@ -64,8 +65,9 @@ class IntcodeComputer:
                 break
             elif opcode in {3, 4, 9}:
                 if opcode == 3: #input
-                    param_1 = __get_param(param_modes[-1], self.puzzle_input[i+1], True)                 
+                    param_1 = __get_param(param_modes[-1], self.puzzle_input[i+1], True)                
                     self.puzzle_input[param_1] = self.input.pop(0) if len(self.input) > 1 else self.input[0]
+                    print(self.puzzle_input[param_1])
                 elif opcode == 4: #output
                     param_1 = __get_param(param_modes[-1], self.puzzle_input[i+1])
                     self.output.append(param_1)
