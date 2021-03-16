@@ -1,8 +1,7 @@
+from collections import defaultdict
 def load_input(task_number):
     with open('puzzle_input/input' + task_number +'.txt') as file:
-        puzzle_input = file.read()
-        puzzle_input = puzzle_input.split(',')
-        puzzle_input = [int(i) for i in puzzle_input]
+        puzzle_input = defaultdict(int, dict(enumerate([int(x) for x in file.read().split(',')])))
     return puzzle_input
 
 class IntcodeComputer:
@@ -42,14 +41,10 @@ class IntcodeComputer:
     def process_intcode(self):
         def __get_param(param_mode, value, add_only = False):
             if param_mode == 2:
-                if len(self.puzzle_input) <= (value + self.relative_base):
-                    self.puzzle_input.extend([0] * (value + self.relative_base - len(self.puzzle_input) + 1))
                 return (value + self.relative_base) if add_only else self.puzzle_input[value + self.relative_base] 
 
-            if len(self.puzzle_input) <= value and add_only:
-                self.puzzle_input.extend([0] * (value - len(self.puzzle_input) + 1))
-            if param_mode == 0:
-                return value if add_only else self.puzzle_input[value] 
+            if param_mode == 0 and not add_only:
+                return self.puzzle_input[value] 
 
             return value
 
@@ -67,7 +62,6 @@ class IntcodeComputer:
                 if opcode == 3: #input
                     param_1 = __get_param(param_modes[-1], self.puzzle_input[i+1], True)                
                     self.puzzle_input[param_1] = self.input.pop(0) if len(self.input) > 1 else self.input[0]
-                    print(self.puzzle_input[param_1])
                 elif opcode == 4: #output
                     param_1 = __get_param(param_modes[-1], self.puzzle_input[i+1])
                     self.output.append(param_1)
@@ -82,6 +76,7 @@ class IntcodeComputer:
             elif opcode in {5, 6}:
                 param_1 = __get_param(param_modes[-1], self.puzzle_input[i+1])
                 param_2 = __get_param(param_modes[-2], self.puzzle_input[i+2])
+
                 if opcode == 5:# jump if not equal to 0
                     i = param_2 if param_1 != 0 else i+3
                     continue
