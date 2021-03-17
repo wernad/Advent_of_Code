@@ -20,12 +20,8 @@ class paintingRobot(ic.IntcodeComputer):
     def get_panels(self):
         return self.panels
 
-    def get_position(self):
-        return self.position
-
     def add_panel(self, color):
         self.panels[self.position] = color
-
 
     def move(self, turn):
         movements_dict = {
@@ -43,15 +39,15 @@ class paintingRobot(ic.IntcodeComputer):
         while True:
             output = []
             while len(output) < 2:
-                if robot.get_panels().get(robot.get_position(), '.') == '.': 
+                if self.panels.get(self.position, '.') == '.': 
                     robot.set_input(0)
                 else:
                     robot.set_input(1)
                 robot.process_intcode()
-                if robot.get_output() == []:
+                if self.output == []:
                     break
-                output.append(robot.get_output()[-1])
-            if robot.get_output() == []:
+                output.append(self.output[-1])
+            if self.output == []:
                 break
             self.panels[self.position] = '.' if output[0] == 0 else '#'
             robot.move(output[1])        
@@ -69,26 +65,17 @@ identifier_panels = [x for x in robot.get_panels() if robot.get_panels()[x] == '
 
 identifier_bottom_left = (min(identifier_panels, key=lambda x: x[0])[0], min(identifier_panels, key=lambda x: x[1])[1])
 identifier_top_right = (max(identifier_panels, key=lambda x: x[0])[0], max(identifier_panels, key=lambda x: x[1])[1])
-identifier_width = abs(identifier_bottom_left[0] - identifier_top_right[0])
-identifier_height = abs(identifier_bottom_left[1] - identifier_top_right[1])
 
-identifier = np.chararray(shape=(identifier_width + 3, identifier_height + 1), unicode=True)
+identifier_width = abs(identifier_bottom_left[0] - identifier_top_right[0]) + 1 # + 1 to include last coordinate
+identifier_height = abs(identifier_bottom_left[1] - identifier_top_right[1]) + 1
+
+identifier = np.chararray(shape=(identifier_width, identifier_height), unicode=True)
 identifier[:] = '-'
 
-new_identifier_panels = dict()
 for key in robot.get_panels():
-    new_identifier_panels[(key[0] + abs(identifier_bottom_left[0]), key[1] + abs(identifier_bottom_left[1]))] = robot.get_panels()[key]
-
-for key in new_identifier_panels:
-    if new_identifier_panels[key] == '#':
-        identifier[key[0]][key[1]] = '#'
-identifier_string = ''
-for x in np.rot90(identifier):
-    for y in x:        
-        identifier_string += y
-    identifier_string += '\n'
-print(identifier_bottom_left, identifier_top_right)
-print(identifier_width, identifier_height)
-print(identifier.shape)
+    if robot.get_panels()[key] == '#':
+        identifier[key[0] - 1][key[1] + abs(identifier_bottom_left[1])] = '#'
+ 
+identifier_string = '\n'.join(''.join('%s' %y for y in x) for x in np.rot90(identifier))
 
 print('Part 2:\n', identifier_string, sep='')
