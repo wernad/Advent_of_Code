@@ -59,29 +59,36 @@ class paintingRobot(ic.IntcodeComputer):
 robot = paintingRobot(puzzle_input, True)
 
 robot.paint()
-
 print('Part 1:', len(robot.get_panels()))
-
-panels = [k for k in robot.get_panels()]
-
-grid_bottom_left = (min(panels, key=lambda x: x[0])[0], min(panels, key=lambda x: x[1])[1])
-grid_top_right = (max(panels, key=lambda x: x[0])[0], max(panels, key=lambda x: x[1])[1])
-
-grid_width = abs(grid_bottom_left[0] - grid_top_right[0])
-grid_height = abs(grid_bottom_left[1] - grid_top_right[1])
 
 robot.restart()
 robot.add_panel('#')
 robot.paint()
 
-identifier = np.chararray(shape=(grid_width, grid_height), unicode=True)
-identifier[:] = '..'
-img = Image.new('RGB', (grid_width,grid_height),"black")
+identifier_panels = [x for x in robot.get_panels() if robot.get_panels()[x] == '#']
+
+identifier_bottom_left = (min(identifier_panels, key=lambda x: x[0])[0], min(identifier_panels, key=lambda x: x[1])[1])
+identifier_top_right = (max(identifier_panels, key=lambda x: x[0])[0], max(identifier_panels, key=lambda x: x[1])[1])
+identifier_width = abs(identifier_bottom_left[0] - identifier_top_right[0])
+identifier_height = abs(identifier_bottom_left[1] - identifier_top_right[1])
+
+identifier = np.chararray(shape=(identifier_width + 3, identifier_height + 1), unicode=True)
+identifier[:] = '-'
+
+new_identifier_panels = dict()
 for key in robot.get_panels():
-    if robot.get_panels()[key] == '#':
-        img.putpixel((key[0] + abs(grid_bottom_left[0]), key[1] + abs(grid_bottom_left[1])), (0,0,255,255))
-        #identifier[key[0] + abs(grid_bottom_left[0])][key[1] + abs(grid_bottom_left[1])] = '#'
+    new_identifier_panels[(key[0] + abs(identifier_bottom_left[0]), key[1] + abs(identifier_bottom_left[1]))] = robot.get_panels()[key]
 
-img = img.transpose(Image.FLIP_TOP_BOTTOM)
+for key in new_identifier_panels:
+    if new_identifier_panels[key] == '#':
+        identifier[key[0]][key[1]] = '#'
+identifier_string = ''
+for x in np.rot90(identifier):
+    for y in x:        
+        identifier_string += y
+    identifier_string += '\n'
+print(identifier_bottom_left, identifier_top_right)
+print(identifier_width, identifier_height)
+print(identifier.shape)
 
-img.show()
+print('Part 2:\n', identifier_string, sep='')
