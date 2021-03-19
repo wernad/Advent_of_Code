@@ -54,7 +54,7 @@ positions = puzzle_input.copy()
 velocities = [[0]*3 for _ in range(len(positions))]
 moons_comb = list(combinations(range(len(positions)), 2))
 
-for i in range(1000)
+for i in range(1000):
     positions, velocities = calc_movement(positions, velocities, moons_comb)
 
 pot = calc_energy(positions)
