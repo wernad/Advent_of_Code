@@ -1,5 +1,6 @@
 from itertools import combinations
 from math import gcd
+import copy
 
 with open('puzzle_input/input12.txt') as file:
     puzzle_input = file.read()
@@ -22,23 +23,23 @@ def calc_movement(positions, velocities, moons_comb):
     
     return positions, velocities
 
-def find_periods(positions, velocities, moons_comb):
-    orig_positions = positions.copy()
-    orig_velocities = velocities.copy()
+def find_axis_period(positions, velocities, moons_comb):
+    orig_positions = copy.deepcopy(positions)
+    orig_velocities = copy.deepcopy(velocities)
     periods = []
-    for i in range(4):
-        start_pos = positions[i]
-        for j in range(3):
-            count = 0
-            while True:
-                positions, velocities = calc_movement(positions, velocities, moons_comb)
-                count += 1
-                if positions[i][j] == start_pos[j]:
-                    break
-
-            periods.append(count)
-        positions = orig_positions.copy()
-        velocities = orig_velocities.copy()
+    
+    for i in range(3):
+        start_pos = [x[i] for x in positions]
+        count = 0
+        while True:                
+            positions, velocities = calc_movement(positions, velocities, moons_comb)
+            count += 1
+            if [x[i] for x in positions] == start_pos and [x[i] for x in velocities] == [0,0,0,0]:
+                break
+                
+        periods.append(count)
+        positions = copy.deepcopy(orig_positions)
+        velocities = copy.deepcopy(orig_velocities)
     return periods 
 
 def lcm(numbers):
@@ -50,7 +51,7 @@ def lcm(numbers):
 
 
 
-positions = puzzle_input.copy()
+positions = copy.deepcopy(puzzle_input)
 velocities = [[0]*3 for _ in range(len(positions))]
 moons_comb = list(combinations(range(len(positions)), 2))
 
@@ -62,8 +63,9 @@ kin = calc_energy(velocities)
 
 print('Part 1:', sum([a*b for a,b in zip(pot, kin)]))
 
-positions = puzzle_input.copy()
+positions = copy.deepcopy(puzzle_input)
 velocities = [[0]*3 for _ in range(len(positions))]
 
-periods = find_periods(positions, velocities, moons_comb)
+periods = find_axis_period(positions, velocities, moons_comb)
+
 print('Part 2:', lcm(periods))
