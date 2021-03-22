@@ -27,7 +27,15 @@ def draw_image(image_layers, image_height, image_width):
             elif layer[x] == 0:
                 image.append(0)
                 break
-    return np.array(image).reshape(6,25)
+    image_string = ''
+    for x in np.array(image).reshape(6,25):
+        for y in x:
+            if y == 0:
+                image_string += ' ' 
+            else:
+                image_string += '#' 
+        image_string += '\n' 
+    return image_string
 
 print('Part 1:', check_image(image_layers))
-print('Part 2:\n', draw_image(image_layers, image_height, image_width))
+print('Part 2:', draw_image(image_layers, image_height, image_width), sep='\n')
