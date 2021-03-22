@@ -1,12 +1,8 @@
 import intcode_computer as ic
 
 from itertools import permutations 
-import time
+
 puzzle_input = ic.load_input('7')
-
-
-start_time = time.time()
-
 
 def max_signal(puzzle_input):
     phases = permutations([0, 1, 2, 3, 4])
@@ -33,13 +29,13 @@ def max_signal_feedback(puzzle_input):
         for i in range(5):
             amps[i].set_input(phase[i], last_output)
             amps[i].process_intcode()
-            last_output = amps[i].get_output()[-1]
+            last_output = amps[i].get_output()
         while not finished:
             for i in range(5):
                 amps[i].set_input(last_output)
                 amps[i].process_intcode()
                 if amps[i].get_output():
-                    last_output = amps[i].get_output()[-1]
+                    last_output = amps[i].get_output()
                 else:
                     finished = True
                     break
@@ -48,4 +44,3 @@ def max_signal_feedback(puzzle_input):
             
 print('Part 1:', max_signal(puzzle_input))
 print('Part 2:', max_signal_feedback(puzzle_input))
-print("--- %s seconds ---" % (time.time() - start_time))
