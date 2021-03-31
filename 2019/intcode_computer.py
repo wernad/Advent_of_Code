@@ -1,3 +1,4 @@
+from copy import deepcopy
 from collections import defaultdict
 def load_input(task_number):
     with open('puzzle_input/input' + task_number +'.txt') as file:
@@ -5,38 +6,26 @@ def load_input(task_number):
     return puzzle_input
 
 class IntcodeComputer:
-    def __init__(self, puzzle_input, feedback):
-        self.puzzle_input = puzzle_input.copy()
-        self.puzzle_input_copy = puzzle_input.copy()
+    def __init__(self, puzzle_input, feedback=False):
+        self.puzzle_input = deepcopy(puzzle_input)
+        self.puzzle_input_copy = deepcopy(puzzle_input)
         self.opcode_position = 0
         self.relative_base = 0
         self.feedback = feedback
         self.input = []
         self.output = []
+        self.turned_on = True
 
     def restart(self, puzzle_input = None):
-        self.puzzle_input = self.puzzle_input_copy.copy() if puzzle_input is None else puzzle_input
+        self.puzzle_input = deepcopy(self.puzzle_input_copy) if puzzle_input is None else puzzle_input
         self.opcode_position = 0
         self.relative_base = 0
         self.input = []
+        self.turned_on = True
         return self
 
-    def set_puzzle_input(self, puzzle_input):
-        self.puzzle_input = puzzle_input.copy()
-
-    def set_opcode_position(self, pos):
-        self.opcode_position = pos
-
-    def set_input(self, *program_input):
-        self.input = []
-        for x in program_input:
-            self.input.append(x)
-    
-    def get_output(self):
-        return self.output
-    
-    def get_puzzle_input(self):
-        return self.puzzle_input
+    def toggle_feedback(self):
+        self.feedback = not self.feedback
 
     def process_intcode(self):
         def __get_param(param_mode, value, add_only = False):
@@ -48,7 +37,6 @@ class IntcodeComputer:
 
             return value
 
-        self.output = []
         i = self.opcode_position
         while True:
             opcode = str(self.puzzle_input[i]).zfill(5)
@@ -56,7 +44,7 @@ class IntcodeComputer:
             opcode = int(opcode[-2:])
             if opcode == 99:
                 if self.feedback:
-                    output = None
+                    self.turned_on = False
                 break
             elif opcode in {3, 4, 9}:
                 if opcode == 3: #input
@@ -64,11 +52,16 @@ class IntcodeComputer:
                     self.puzzle_input[param_1] = self.input.pop(0) if len(self.input) > 1 else self.input[0]
                 elif opcode == 4: #output
                     param_1 = __get_param(param_modes[-1], self.puzzle_input[i+1])
-                    self.output.append(param_1)
                     if self.feedback:
                         i += 2
                         self.opcode_position = i
+                        if len(self.output) > 0: 
+                            self.output.append(param_1)
+                        else:
+                            self.output = [param_1]
                         break
+                    else:
+                        self.output.append(param_1)
                 elif opcode == 9: #change relative base
                     param_1 = __get_param(param_modes[-1], self.puzzle_input[i+1])
                     self.relative_base += param_1

@@ -1,11 +1,11 @@
 import intcode_computer as ic
 
 puzzle_input = ic.load_input('2')
-computer = ic.IntcodeComputer(puzzle_input.copy(), False)
+computer = ic.IntcodeComputer(puzzle_input.copy())
 
 #Part 1
 computer.process_intcode()
-print('Part 1:', computer.get_puzzle_input()[0])
+print('Part 1:', computer.puzzle_input[0])
 #Part 2
 found = 0
 i = 0
@@ -16,7 +16,7 @@ while j < 100:
 
     computer.restart(puzzle_input.copy())
     computer.process_intcode()
-    if computer.get_puzzle_input()[0] == 19690720:
+    if computer.puzzle_input[0] == 19690720:
         break
 
     i = i + 1

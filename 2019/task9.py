@@ -2,13 +2,13 @@ import intcode_computer as ic
 
 puzzle_input = ic.load_input('9')
 
-computer = ic.IntcodeComputer(puzzle_input.copy(), False)
+computer = ic.IntcodeComputer(puzzle_input)
 
-computer.set_input(1)
+computer.input = [1]
 computer.process_intcode()
-print('Part 1:', computer.get_output())
+print('Part 1:', computer.output[-1])
 
 computer.restart()
-computer.set_input(2)
+computer.input = [2]
 computer.process_intcode()
-print('Part 2:', computer.get_output())
+print('Part 2:', computer.output[-1])
