@@ -71,8 +71,6 @@ leaves = find_leaves()
 
 paths = find_all_paths(leaves)
 
-count_transfers(obj1, obj2, paths)
-
 print('Part 1:', count_orbits(paths))
 
 print('Part 2:', count_transfers(obj1, obj2, paths))
