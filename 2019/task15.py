@@ -1,5 +1,5 @@
 import intcode_computer as ic
-from collections import defaultdict
+from collections import defaultdict, deque
 
 puzzle_input = ic.load_input('15')
 
@@ -9,16 +9,7 @@ class repairDroid(ic.IntcodeComputer):
         self.available_moves = defaultdict((lambda: [1,2,3,4]), {(0, 0): [1,2,3,4]})
         self.position = (0,0)
         self.oxygen_system = None
-        self.area = dict()
-
-    def add_coord(self, parent, child):
-        self.area[parent].append(child)
-
-    def restart(self, *args, **kwargs):
-        super(repairDroid, self).restart(*args, **kwargs)
-        self.available_moves = defaultdict(lambda: [1,2,3,4], {(0, 0): [1,2,3,4]})
-        self.position = (0,0)
-        self.backtrack = []
+        self.area = [(0,0)]
 
     def opposite_direction(self, direction):
         direction_dict = {
@@ -42,15 +33,13 @@ class repairDroid(ic.IntcodeComputer):
         return new_position
 
     def dfs(self):
-        backtrack = []
-        solution = {self.position : self.position}
+        backtrack = deque()
         visited = set(self.position)
-        visited.add(self.position)
-        path_length = float('inf')
-        while len(self.available_moves[(0,0)]) > 0 or self.position != (0,0):
+        path_length = 0
+        while len(self.available_moves[(0,0)]) > 0:
             
             if len(self.available_moves[self.position]) == 0:
-                dir_back = backtrack.pop(-1)
+                dir_back = backtrack.pop()
                 new_pos = self.calc_new_pos(dir_back)
                 self.position = new_pos
                 self.input = [dir_back]
@@ -76,8 +65,37 @@ class repairDroid(ic.IntcodeComputer):
                 self.oxygen_system = self.position
 
             visited.add(self.position)
+            self.area.append(self.position)
         return path_length
-            
+
+    def bfs(self):
+        visited = set(self.oxygen_system)
+        queue = deque([self.oxygen_system])
+        time_to_fill = 0
+        while queue:
+            new_queue = deque()
+            for position in queue:
+                x = position[0]
+                y = position[1]
+                if (x + 1, y) in self.area and (x + 1, y) not in visited:
+                    new_queue.append((x + 1, y))
+                if (x - 1, y) in self.area and (x - 1, y) not in visited:
+                    new_queue.append((x - 1, y))
+                if (x, y + 1) in self.area and (x, y + 1) not in visited:
+                    new_queue.append((x, y + 1))
+                if (x, y - 1) in self.area and (x, y - 1) not in visited:
+                    new_queue.append((x, y - 1))
+                visited.add(position)
+            queue = new_queue
+            if queue:
+                time_to_fill += 1
+        return time_to_fill
+
+
+
+ 
+
             
 droid = repairDroid(puzzle_input, True)
 print('Part 1:', droid.dfs())
+print('Part 2:', droid.bfs())
