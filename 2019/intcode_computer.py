@@ -52,16 +52,14 @@ class IntcodeComputer:
                     self.puzzle_input[param_1] = self.input.pop(0) if len(self.input) > 1 else self.input[0]
                 elif opcode == 4: #output
                     param_1 = __get_param(param_modes[-1], self.puzzle_input[i+1])
+                    if len(self.output) > 0: 
+                        self.output.append(param_1)
+                    else:
+                        self.output = [param_1]
                     if self.feedback:
                         i += 2
                         self.opcode_position = i
-                        if len(self.output) > 0: 
-                            self.output.append(param_1)
-                        else:
-                            self.output = [param_1]
                         break
-                    else:
-                        self.output.append(param_1)
                 elif opcode == 9: #change relative base
                     param_1 = __get_param(param_modes[-1], self.puzzle_input[i+1])
                     self.relative_base += param_1
@@ -89,4 +87,3 @@ class IntcodeComputer:
                 elif opcode == 8: # 1 if a == b else 0
                     self.puzzle_input[param_3] = 1 if param_1 == param_2 else 0
                 i += 4
-        

@@ -24,12 +24,12 @@ score = 0
 arcade.input = [0]
 while arcade.turned_on:
     arcade.process_intcode()
-    x = arcade.output
+    x = arcade.output[-1]
     arcade.process_intcode()
-    y = arcade.output
+    y = arcade.output[-1]
     arcade.process_intcode()
-    tile_id = arcade.output
-
+    tile_id = arcade.output[-1]
+    
     if tile_id == 3:
         paddle_pos = x
     elif tile_id == 4:

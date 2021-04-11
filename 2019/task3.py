@@ -2,8 +2,8 @@ from itertools import tee
 import more_itertools
 
 with open('puzzle_input/input3.txt') as file:
-    program_input = file.read()
-    wire1_steps, wire2_steps = program_input.split('\n')
+    puzzle_input = file.read()
+    wire1_steps, wire2_steps = puzzle_input.split('\n')
     wire1_steps = [(x[0], int(x[1:])) for x in wire1_steps.split(',')]
     wire2_steps = [(x[0], int(x[1:])) for x in wire2_steps.split(',')]
     

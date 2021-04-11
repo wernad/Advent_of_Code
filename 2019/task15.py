@@ -90,11 +90,6 @@ class repairDroid(ic.IntcodeComputer):
             if queue:
                 time_to_fill += 1
         return time_to_fill
-
-
-
- 
-
             
 droid = repairDroid(puzzle_input, True)
 print('Part 1:', droid.dfs())
