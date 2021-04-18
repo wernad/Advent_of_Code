@@ -3,55 +3,22 @@ from collections import defaultdict, deque
 with open('puzzle_input/input20.txt') as file:
     puzzle_input = [list(x.strip('\n')) for x in file.readlines()]
 
-def find_portals(maze):
-    def seek_function(coord, findPosition):
-        global directions
-        x1 = coord[0]
-        y1 = coord[1]
-        for x2, y2 in directions:
-            x = x1 + x2
-            y = y1 + y2
-            if (x, y) in maze:
-                if maze[(x, y)].isalpha() and not findPosition:
-                    return (x, y), maze[(x, y)]
-                if maze[(x, y)] == '.' and findPosition:
-                    return (x, y)
-
-    portals = defaultdict(set)
-    start, end = None, None
-
-    for k, v in maze.items():
-        if v.isalpha() and k not in portals:
-            portal_exit = seek_function(k, True)
-            portal_other_half, portal_other_letter = seek_function(k, False)
-            if not portal_exit:
-                portal_exit = seek_function(portal_other_half, True)
-            if v == 'A':
-                start = portal_exit
-            elif v == 'Z':
-                end = portal_exit
-            else:                
-                portals[''.join(sorted(v + portal_other_letter))].add(portal_exit)
-            
-        
-    return start, end, portals
-
-def bfs(start, end):
-    global portal_gates, maze
+def bfs(start, end, maze):
+    global portals
     
     visited = set(start)
     queue = deque([start])
     solution = dict()
-    count = 0
+    
     while queue:
         new_queue = deque()
         for position in queue:
             x = position[0]
             y = position[1]
             
-            if position in portal_gates:
-                new_queue.append(portal_gates[position])
-                solution[portal_gates[position]] = position
+            if position in portals and portals[position] not in visited:
+                new_queue.append(portals[position])
+                solution[portals[position]] = position
                 visited.add(position)
                 continue
 
@@ -86,20 +53,66 @@ def bfs(start, end):
 
     return count
 
+def add_tuples(a,b):
+    return tuple([i + j for i, j in zip(a, b)])
+
+def check_neighbours(a,b):
+    global directions
+    return True if tuple([abs(i - j) for i, j in zip(a, b)]) in directions else False
+
+def find_open_passage(pos1, pos2):
+
+    global directions
+    for d in directions:
+        new_pos = add_tuples(pos1, d)
+        if new_pos in maze:
+            return new_pos 
+
+        new_pos = add_tuples(pos2, d)
+        if new_pos in maze:
+            return new_pos 
+
+def construct_portals(maze, portal_letters):
+    start, end = None, None
+    portals = defaultdict(list)
+
+    while portal_letters:
+        a = portal_letters.popitem()
+        b = None
+        for new_b in portal_letters.items():
+            if check_neighbours(a[0],new_b[0]):
+                b = new_b
+                break
+        del portal_letters[b[0]]
+        portal_name = ''.join(sorted(a[1]+b[1]))
+        portal_entrance = find_open_passage(a[0],b[0])
+        if portal_name == 'AA':
+            start = portal_entrance
+            continue
+        elif portal_name == 'ZZ':
+            end = portal_entrance
+            continue
+        portals[portal_name].append(portal_entrance)
+
+    portals = {k: v for _, entrances in portals.items() for k,v in zip((entrances[0], entrances[1]), (entrances[1], entrances[0]))}
+    return start, end, portals
+       
+
 maze = dict()
+portal_letters = dict()
 
 x, y = 0, 0
 for line in puzzle_input:
     for i in line:
-        if i.isalpha() or i == '.':
+        if i.isalpha():
+            portal_letters[(x,y)] = i
+        elif i == '.':
             maze[(x,y)] = i
         x += 1
     y += 1
     x = 0
 
 directions = [(1, 0), (-1, 0), (0, -1), (0, 1)]
+start, end, portals = construct_portals(maze, portal_letters)
 
-start_pos, end_pos, portals = find_portals(maze)     
-portal_gates = {list(v)[0]: list(v)[1]  for _, v in portals.items()}
-
-print(bfs(start_pos, end_pos))
+print(bfs(start, end, maze))
