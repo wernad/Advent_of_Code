@@ -1,4 +1,5 @@
 from collections import defaultdict, deque
+from copy import deepcopy 
 
 with open('puzzle_input/input20.txt') as file:
     puzzle_input = [list(x.strip('\n')) for x in file.readlines()]
@@ -8,46 +9,78 @@ def bfs(start, end, maze):
     
     visited = set(start)
     queue = deque([start])
-    solution = dict()
+    solution = {start: start}
     
     while queue:
         new_queue = deque()
         for position in queue:
             x = position[0]
             y = position[1]
-            
+
+            for new_pos in [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]:
+                if new_pos in maze and new_pos not in visited:
+                    new_queue.append(new_pos)
+                    solution[new_pos] = position
+
             if position in portals and portals[position] not in visited:
                 new_queue.append(portals[position])
                 solution[portals[position]] = position
-                visited.add(position)
-                continue
-
-            new_pos = (x + 1, y)
-            if new_pos in maze and new_pos not in visited:
-                new_queue.append(new_pos)
-                solution[new_pos] = position
-                
-            new_pos = (x - 1, y)
-            if new_pos in maze and new_pos not in visited:
-                new_queue.append(new_pos)
-                solution[new_pos] = position
-                
-            new_pos = (x, y + 1)
-            if new_pos in maze and new_pos not in visited:
-                new_queue.append(new_pos)
-                solution[new_pos] = position
-                
-            new_pos = (x, y - 1)
-            if new_pos in maze and new_pos not in visited:
-                new_queue.append(new_pos)
-                solution[new_pos] = position
-            
+        
             visited.add(position)
 
         queue = new_queue
     count = 0
     current_coord = end
     while current_coord != start:
+        current_coord = solution[current_coord]
+        count += 1
+
+    return count
+
+def bfs_layered(start, end, maze):
+    global portals
+    
+    outer_x = set([max([x[0] for x in portals]), min([x[0] for x in portals])])
+    outer_y = set([max([x[1] for x in portals]), min([x[1] for x in portals])])
+    visited = set([(start, 0)])
+    queue = deque([(start, 0)])
+    solution = {(start, 0): (start, 0)}
+    found = False
+    while any(len(x) > 0 for x in queue) and not found:
+        new_queue = deque()
+        for position, layer in queue:
+            #print(layer)
+            x = position[0]
+            y = position[1]
+
+            for new_pos in [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]:
+                if new_pos in maze and (new_pos, layer) not in visited:
+                    new_queue.append((new_pos, layer))
+                    solution[(new_pos, layer)] = (position, layer)
+                    if (new_pos, layer) == (end, 0):
+                        found = True
+
+            if position in portals and (position, layer) not in visited:
+                new_layer = layer
+                if x in outer_x or y in outer_y:
+                    if layer == 0:
+                        continue
+                    new_layer -= 1
+                elif x not in outer_x or y not in outer_y:
+                    if layer + 1 >= len(portals)//2:
+                        continue
+                    new_layer += 1
+                
+                solution[(portals[position], new_layer)] = (position, layer)                    
+                new_queue.append((portals[position], new_layer))
+                visited.add((portals[position], new_layer))
+                
+            visited.add((position, layer))
+        queue = new_queue
+    
+    count = 0
+    current_coord = (end, 0)
+    while current_coord != (start, 0):
         current_coord = solution[current_coord]
         count += 1
 
@@ -115,4 +148,5 @@ for line in puzzle_input:
 directions = [(1, 0), (-1, 0), (0, -1), (0, 1)]
 start, end, portals = construct_portals(maze, portal_letters)
 
-print(bfs(start, end, maze))
+print('Part 1:', bfs(start, end, maze))
+print('Part 2:', bfs_layered(start, end, maze))
