@@ -18,17 +18,30 @@ def ASCII2list(input_list):
 
 droid = springDroid(puzzle_input)
 
-intructions = '''NOT B J
-NOT C T
+walk_program = '''NOT C T
 OR T J
 NOT A T
 OR T J
 AND D J
-OR T J
 WALK'''
 
-droid.input = list2ASCII(intructions)
+run_program = '''NOT B J
+NOT C T
+OR T J
+AND D J
+AND H J
+NOT A T
+OR T J
+RUN'''
 
+droid.input = list2ASCII(walk_program)
 droid.process_intcode()
-print('Part 1:', droid.output[-1])
-#''.join(ASCII2list(droid.output))
+output1 = droid.output[-1]
+
+droid.restart()
+droid.input = list2ASCII(run_program)
+droid.process_intcode()
+output2 = droid.output[-1]
+
+print('Part 1:', output1)
+print('Part 2:', output2)
