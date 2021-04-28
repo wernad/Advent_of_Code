@@ -6,22 +6,25 @@ def load_input(task_number):
     return puzzle_input
 
 class IntcodeComputer:
-    def __init__(self, puzzle_input, feedback=False):
+    def __init__(self, puzzle_input, feedback = False, input_feedback = False):
         self.puzzle_input = deepcopy(puzzle_input)
         self.puzzle_input_copy = deepcopy(puzzle_input)
         self.opcode_position = 0
         self.relative_base = 0
         self.feedback = feedback
+        self.input_feedback = input_feedback
+        self.last_input = None
         self.input = []
         self.output = []
         self.turned_on = True
 
     def restart(self, puzzle_input = None):
-        self.puzzle_input = deepcopy(self.puzzle_input_copy) if puzzle_input is None else puzzle_input
+        self.puzzle_input = deepcopy(self.puzzle_input_copy) if puzzle_input is None else deepcopy(puzzle_input)
         self.opcode_position = 0
         self.relative_base = 0
         self.input = []
         self.turned_on = True
+        self.output = []
         return self
 
     def toggle_feedback(self):
@@ -36,26 +39,28 @@ class IntcodeComputer:
                 return self.puzzle_input[value] 
 
             return value
-
         i = self.opcode_position
         while True:
             opcode = str(self.puzzle_input[i]).zfill(5)
             param_modes = [int(x) for x in opcode[:-2]]
             opcode = int(opcode[-2:])
+            #if self.name == '14':
+            #    print(i, opcode, self.input)
             if opcode == 99:
                 if self.feedback:
                     self.turned_on = False
                 break
             elif opcode in {3, 4, 9}:
                 if opcode == 3: #input
+                    if self.input_feedback and not self.input:
+                        self.opcode_position = i
+                        return -1
                     param_1 = __get_param(param_modes[-1], self.puzzle_input[i+1], True)                
-                    self.puzzle_input[param_1] = self.input.pop(0) if len(self.input) > 1 else self.input[0]
+                    self.last_input = self.input.pop(0) if len(self.input) > 0 else self.last_input
+                    self.puzzle_input[param_1] = self.last_input
                 elif opcode == 4: #output
                     param_1 = __get_param(param_modes[-1], self.puzzle_input[i+1])
-                    if len(self.output) > 0: 
-                        self.output.append(param_1)
-                    else:
-                        self.output = [param_1]
+                    self.output.append(param_1)
                     if self.feedback:
                         i += 2
                         self.opcode_position = i
