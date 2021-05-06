@@ -31,7 +31,6 @@ def find_closest_point(square_side):
     x_min = 0
     x_max = 3
     for y in count(start=0):
-        print(y, x_min, x_max)
         for x in range(x_min, x_max):   
             drone.input = [x, y]
             drone.process_intcode()

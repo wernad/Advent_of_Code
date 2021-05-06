@@ -131,14 +131,6 @@ class vacuumRobot(ic.IntcodeComputer):
 
         return main_routine, functions
 
-def list2ASCII(input_list):
-    new_list = [ord(x) for x in input_list]
-    new_list.append(10)
-    return new_list
-
-def ASCII2list(input_list):
-    return [chr(x) for x in input_list]
-
 robot = vacuumRobot(puzzle_input)
 robot.process_intcode()
 #robot.draw_area()
@@ -157,11 +149,10 @@ main_routine, functions = robot.find_routine()
 puzzle_input[0] = 2
 robot.puzzle_input = puzzle_input
 
-robot.input = list2ASCII(main_routine)
+robot.input = robot.list2ASCII(main_routine)
 for x in functions:
-    robot.input.extend(list2ASCII(x))
+    robot.input.extend(robot.list2ASCII(x))
 robot.input.extend([ord('n'), 10])
-
 robot.process_intcode()
 
 print('Part 1:', sum([x[0] * x[1] for x in intersections]))

@@ -8,14 +8,6 @@ class springDroid(ic.IntcodeComputer):
         self.scaffolds = dict()
         self.path = ''
 
-def list2ASCII(input_list):
-    new_list = [ord(x) for x in input_list]
-    new_list.append(10)
-    return new_list
-    
-def ASCII2list(input_list):
-    return [chr(x) for x in input_list]
-
 droid = springDroid(puzzle_input)
 
 walk_program = '''NOT C T
@@ -34,12 +26,12 @@ NOT A T
 OR T J
 RUN'''
 
-droid.input = list2ASCII(walk_program)
+droid.input = droid.list2ASCII(walk_program)
 droid.process_intcode()
 output1 = droid.output[-1]
 
 droid.restart()
-droid.input = list2ASCII(run_program)
+droid.input = droid.list2ASCII(run_program)
 droid.process_intcode()
 output2 = droid.output[-1]
 
