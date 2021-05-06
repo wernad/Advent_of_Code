@@ -60,7 +60,6 @@ def calc_infestation(initial_layout):
         
         new_layers = dict()
         for level, layout in layers.items():
-            #print(index)
             new_layout = []
             for y in range(square_side):
                 for x in range(square_side):
@@ -92,9 +91,6 @@ def calc_infestation(initial_layout):
                         new_layout.append((x,y))            
             new_layers[level] = new_layout
         layers = new_layers
-    for k,v in layers.items():
-        print(k, len(v))
-    print('Total layers:',len(layers))
     return sum([len(layout) for layout in layers.values()])
 
 
@@ -116,4 +112,4 @@ for y in range(5):
             powers_of_two.append(2**(x+y*square_side))
 
 print('Part 1:', sum(powers_of_two))
-print('Part 2: ', calc_infestation(initial_layout))
+print('Part 2:', calc_infestation(initial_layout))
