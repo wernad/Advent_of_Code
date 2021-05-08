@@ -30,6 +30,14 @@ class IntcodeComputer:
     def toggle_feedback(self):
         self.feedback = not self.feedback
 
+    def list2ASCII(self, input_list):
+        new_list = [ord(x) for x in input_list]
+        new_list.append(10)
+        return new_list
+    
+    def ASCII2list(self, input_list):
+        return [chr(x) for x in input_list]
+
     def process_intcode(self):
         def __get_param(param_mode, value, add_only = False):
             if param_mode == 2:
@@ -44,8 +52,6 @@ class IntcodeComputer:
             opcode = str(self.puzzle_input[i]).zfill(5)
             param_modes = [int(x) for x in opcode[:-2]]
             opcode = int(opcode[-2:])
-            #if self.name == '14':
-            #    print(i, opcode, self.input)
             if opcode == 99:
                 if self.feedback:
                     self.turned_on = False
@@ -92,3 +98,4 @@ class IntcodeComputer:
                 elif opcode == 8: # 1 if a == b else 0
                     self.puzzle_input[param_3] = 1 if param_1 == param_2 else 0
                 i += 4
+        
