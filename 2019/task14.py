@@ -1,3 +1,4 @@
+from copy import deepcopy
 from collections import defaultdict
 from math import ceil
 
@@ -22,6 +23,25 @@ def set_complexity_levels():
         
     return complexity_levels
 
+def find_simple_chemicals(product):
+    global recipes, complexity_levels
+    chemicals = defaultdict(int, product)
+
+    while len(chemicals) > 1 or 'ORE' not in chemicals:
+        top_level_chem = max(chemicals, key=lambda x: complexity_levels[x])
+        new_chemicals = defaultdict(int)
+        current_cycle = {k:v for k,v in chemicals.items() if complexity_levels[k] == complexity_levels[top_level_chem]}
+
+        for chem in current_cycle:
+            del chemicals[chem]
+            chem_required = current_cycle[chem]
+
+            ingredients, produced_amount = recipes[chem]
+            multiplier = ceil(chem_required/produced_amount)
+            for i in ingredients:
+                chemicals[i] += (ingredients[i] * multiplier)
+    return chemicals['ORE']
+
 def find_ore_req(product):
     global recipes, complexity_levels
     chemicals = defaultdict(int, product)
@@ -36,15 +56,14 @@ def find_ore_req(product):
 
         for i in ingredients:
             chemicals[i] += (ingredients[i] * multiplier)
-            
     return chemicals['ORE']
 
 def max_fuel(low,high):
     global stored_ore
-    current_value = find_ore_req({'FUEL': low})
+    current_value = find_simple_chemicals({'FUEL': low})
     while high - low != 1:
         mid = (high + low)//2
-        current_value = find_ore_req({'FUEL': mid})
+        current_value = find_simple_chemicals({'FUEL': mid})
 
         if current_value > stored_ore:
             high = mid
@@ -61,52 +80,10 @@ for k,v in puzzle_input.items():
     recipes[k] = (new_dict, v[1])
 
 complexity_levels = set_complexity_levels()
-ore_count = find_ore_req({'FUEL': 1})
 
 stored_ore = 1000000000000
 low = 1
 high = 2000000
 
-print('Part 1', ore_count)
+print('Part 1:', find_simple_chemicals({'FUEL': 1}))
 print('Part 2:', max_fuel(low, high))
-
-#simple_chemicals = find_simple_chemicals({'FUEL':1})
-#print(chem2ore(simple_chemicals))
-
-""" Bad approach
-def find_simple_chemicals(product):
-    global recipes, complexity_levels
-    chemicals = defaultdict(int, product)
-    final_reaction = defaultdict(int)
-    while chemicals:
-        new_chemicals = defaultdict(int)
-        chemicals = dict(sorted(chemicals.items(), key=lambda x: complexity_levels[x[0]], reverse=True))
-        print(chemicals)
-        for chem in chemicals:
-            top_level_chem = max(chemicals, key=lambda x: complexity_levels[x])
-            if complexity_levels[chem] < complexity_levels[top_level_chem]:
-                #print(chem, complexity_levels[chem], '<<<', max(chemicals, key=lambda x: complexity_levels[x]), complexity_levels[max(chemicals, key=lambda x: complexity_levels[x])])
-                new_chemicals[chem] = chemicals[chem]
-                continue
-            print(chem, complexity_levels[chem])
-            chem_required = chemicals[chem]
-            ingredients, produced_amount = recipes[chem]
-            multiplier = ceil(chem_required/produced_amount)
-            for i in ingredients:
-                if i == 'ORE':
-                    final_reaction[chem] += (chem_required * multiplier)
-                else:
-                    new_chemicals[i] += (ingredients[i] * multiplier)
-        chemicals = new_chemicals
-    #print(final_reaction)
-    return final_reaction
-
-def chem2ore(chemicals):
-    ore_count = 0
-    for chem in chemicals:
-        chem_required = chemicals[chem]
-        ingredients, produced_amount = recipes[chem]
-        multiplier = ceil(chem_required/produced_amount)
-        ore_count += (produced_amount * multiplier)
-    return ore_count
-"""
