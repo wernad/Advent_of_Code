@@ -65,10 +65,3 @@ while True:
         break
     else:
         print('Incorrect mode. Try again.')
-        
-#if user_input == 'save':
-#    with open('all_items.txt', 'w') as f:
-#        print([v for v in droid.puzzle_input.values()])
-#        f.write(','.join([str(v) for v in droid.puzzle_input.values()]))
-#        f.close
-#        continue
