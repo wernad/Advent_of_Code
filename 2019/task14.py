@@ -42,22 +42,6 @@ def find_simple_chemicals(product):
                 chemicals[i] += (ingredients[i] * multiplier)
     return chemicals['ORE']
 
-def find_ore_req(product):
-    global recipes, complexity_levels
-    chemicals = defaultdict(int, product)
-    while 'ORE' not in chemicals or len(chemicals) > 1:
-        chem = max(chemicals, key=lambda x: complexity_levels[x])
-        required_amount = chemicals[chem]
-        del chemicals[chem]
-
-        ingredients, produced_amount = recipes[chem]
-        
-        multiplier = ceil(required_amount/produced_amount)
-
-        for i in ingredients:
-            chemicals[i] += (ingredients[i] * multiplier)
-    return chemicals['ORE']
-
 def max_fuel(low,high):
     global stored_ore
     current_value = find_simple_chemicals({'FUEL': low})
