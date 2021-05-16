@@ -8,8 +8,8 @@ arcade.process_intcode()
 arcade_output = arcade.output
 
 count = 0
-for i in range(0, len(arcade_output), 3):
-    if arcade_output[i+2] == 2:
+for i in range(2, len(arcade_output), 3):
+    if arcade_output[i] == 2:
         count += 1
 
 print('Part 1:', count)
@@ -25,8 +25,10 @@ arcade.input = [0]
 while arcade.turned_on:
     arcade.process_intcode()
     x = arcade.output[-1]
+
     arcade.process_intcode()
     y = arcade.output[-1]
+    
     arcade.process_intcode()
     tile_id = arcade.output[-1]
     

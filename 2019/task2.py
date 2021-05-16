@@ -1,27 +1,22 @@
 import intcode_computer as ic
 
+def find_input(puzzle_input, output):
+    for j in range(100):
+        for i in range(100):
+            puzzle_input[1] = i
+            puzzle_input[2] = j
+
+            computer = ic.IntcodeComputer(puzzle_input)
+            computer.process_intcode()
+            if computer.puzzle_input[0] == 19690720:
+                return i*100+j
+
 puzzle_input = ic.load_input('2')
-computer = ic.IntcodeComputer(puzzle_input.copy())
+computer = ic.IntcodeComputer(puzzle_input)
 
-#Part 1
 computer.process_intcode()
+
+OUTPUT = 19690720
+
 print('Part 1:', computer.puzzle_input[0])
-#Part 2
-found = 0
-i = 0
-j = 0
-while j < 100:
-    puzzle_input[1] = i
-    puzzle_input[2] = j
-
-    computer.restart(puzzle_input.copy())
-    computer.process_intcode()
-    if computer.puzzle_input[0] == 19690720:
-        break
-
-    i = i + 1
-    if i > 99:
-        i = 0
-        j = j + 1
-
-print('Part 2:', 100*i+j)
+print('Part 2:', find_input(puzzle_input, OUTPUT))

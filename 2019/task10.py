@@ -6,18 +6,16 @@ with open('puzzle_input/input10.txt') as file:
     puzzle_input = [(lambda x: [y for y in x])(x) for x in puzzle_input]
  
 def set_coordinates(puzzle_input):
+    max_height = len(puzzle_input)
+    max_width = len(puzzle_input[0])
     region_map = []
-    x = 0
-    y = 0
-    for line in puzzle_input:
-        new_line = []
-        for i in line:
-            region_map.append((i, [x, y]))
-            x += 1
-        y += 1
-        x = 0
+    for y in range(max_height):
+        line = puzzle_input.pop(0)
+        for x in range(max_width):
+            region_map.append((line.pop(0), [x, y]))
     return region_map
 
+#Calculates angle of every asteroid and 
 def find_angles(x, region_map, ret_coords=False):
     angles = []
     for y in region_map:
@@ -32,6 +30,7 @@ def find_angles(x, region_map, ret_coords=False):
             angles.append(angle)
     return angles
 
+#Finds laser position.
 def find_best_spot(region_map):
     counts = []
     for x in region_map:
@@ -41,31 +40,32 @@ def find_best_spot(region_map):
         counts.append([len(angles), x[1]])
     return max(counts, key=lambda x: x[0])
 
+#Groups positions by common angle and sorts them by distance from laser position.
 def group_by_angle(angles_with_positions, laser_pos):
     def calc_distance(x):
         return ((x[0] - laser_pos[1][0])**2 + (x[1] - laser_pos[1][1])**2)
 
     new_dict = defaultdict(list)
-    for x in angles_with_positions:
-        if list(x[1:]) == laser_pos[1]:
+    for pos in angles_with_positions:
+        if list(pos[1:]) == laser_pos[1]:
             continue
-        new_dict[x[0]].append(x[1:])
-    for x in new_dict:
-        new_dict[x].sort(key=calc_distance)
-    return new_dict
+        new_dict[pos[0]].append(pos[1:])
 
+    for angle in new_dict:
+        new_dict[angle].sort(key=calc_distance)
+
+    return new_dict
+    
 def destroy_asteroids(angles_dict):
     count = 0
-    current_asteroid = None
-    array = []
-    while count < 200 and angles_dict != [] :
-        angles_dict = {k: v for k, v in angles_dict.items() if v is not None}
+    last_asteroid = None
+    while count < 200:
         for x in angles_dict:
             if count >= 200:
                 break
-            array.append(angles_dict[x].pop(0))
+            last_asteroid = angles_dict[x].pop(0)
             count += 1
-    return array[-1] 
+    return last_asteroid
 
 region_map = set_coordinates(puzzle_input)
 

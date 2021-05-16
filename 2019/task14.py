@@ -7,10 +7,11 @@ with open('puzzle_input/input14.txt') as file:
     puzzle_input = [(lambda x: (x[0].split(','), x[1]))(x)for x in puzzle_input]
     puzzle_input = {x[1].split()[1] : (x[0],int(x[1].split()[0])) for x in puzzle_input}
 
+#Sets complexity levels of chemicals based on theirs ingredients. Chemicals made from ORE only are the simplest.
 def set_complexity_levels():
     global recipes
     complexity_levels = dict({'ORE' : 0})
-    level = 1
+    level = 1 #Starting level
     while len(recipes) >= len(complexity_levels):
         new_levels = {}
         for chem in recipes:
@@ -23,6 +24,7 @@ def set_complexity_levels():
         
     return complexity_levels
 
+#Goes through recipes from most complex to simplest chemical, ending up with ORE only.
 def find_simple_chemicals(product):
     global recipes, complexity_levels
     chemicals = defaultdict(int, product)
@@ -30,7 +32,7 @@ def find_simple_chemicals(product):
     while len(chemicals) > 1 or 'ORE' not in chemicals:
         top_level_chem = max(chemicals, key=lambda x: complexity_levels[x])
         new_chemicals = defaultdict(int)
-        current_cycle = {k:v for k,v in chemicals.items() if complexity_levels[k] == complexity_levels[top_level_chem]}
+        current_cycle = {k:v for k,v in chemicals.items() if complexity_levels[k] == complexity_levels[top_level_chem]} #Get most complex chemicals from current queue.
 
         for chem in current_cycle:
             del chemicals[chem]
@@ -42,6 +44,7 @@ def find_simple_chemicals(product):
                 chemicals[i] += (ingredients[i] * multiplier)
     return chemicals['ORE']
 
+#Binary search to find maximum amount of creatable fuel.
 def max_fuel(low,high):
     global stored_ore
     current_value = find_simple_chemicals({'FUEL': low})

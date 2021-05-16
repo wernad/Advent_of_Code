@@ -38,38 +38,41 @@ class paintingRobot(ic.IntcodeComputer):
             output = []
             while len(output) < 2:
                 if self.panels[self.position] == '.': 
-                    robot.input = [0]
+                    self.input = [0]
                 else:
-                    robot.input = [1]
-                robot.process_intcode()
+                    self.input = [1]
+                self.process_intcode()
                 output.append(self.output[-1])
             self.panels[self.position] = '.' if output[0] == 0 else '#'
-            robot.move(output[1])        
+            self.move(output[1])        
 
 robot = paintingRobot(puzzle_input, True)
 
 robot.paint()
 print('Part 1:', len(robot.panels))
 
-robot.restart()
+robot = paintingRobot(puzzle_input, True)
 robot.add_panel('#')
 robot.paint()
 
 identifier_panels = [x for x in robot.panels if robot.panels[x] == '#']
 
+#Finds corners of identifier image
 identifier_bottom_left = (min(identifier_panels, key=lambda x: x[0])[0], min(identifier_panels, key=lambda x: x[1])[1])
 identifier_top_right = (max(identifier_panels, key=lambda x: x[0])[0], max(identifier_panels, key=lambda x: x[1])[1])
 
-identifier_width = abs(identifier_bottom_left[0] - identifier_top_right[0]) + 1 # + 1 to include last coordinate
+#Calculates dimensions
+identifier_width = abs(identifier_bottom_left[0] - identifier_top_right[0]) + 1# + 1 to include last coordinate
 identifier_height = abs(identifier_bottom_left[1] - identifier_top_right[1]) + 1
 
-identifier = np.chararray(shape=(identifier_width, identifier_height), unicode=True)
-identifier[:] = '-'
+identifier = np.ndarray(shape=(identifier_width, identifier_height), dtype='U3')
+identifier[:] = ' '
 
-for key in robot.panels:
-    if robot.panels[key] == '#':
-        identifier[key[0] - 1][key[1] + abs(identifier_bottom_left[1])] = '#'
- 
+for coord in robot.panels:
+    if robot.panels[coord] == '#':
+        identifier[coord[0] - 1][coord[1] + abs(identifier_bottom_left[1])] = '#'
+        
+identifier = identifier[:-1, :]
 identifier_string = '\n'.join(''.join(y for y in x) for x in np.rot90(identifier))
 
 print('Part 2:', identifier_string, sep='\n')

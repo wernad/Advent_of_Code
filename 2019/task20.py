@@ -49,7 +49,6 @@ def bfs_layered(start, end, maze):
     while any(len(x) > 0 for x in queue) and not found:
         new_queue = deque()
         for position, layer in queue:
-            #print(layer)
             x = position[0]
             y = position[1]
 

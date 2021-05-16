@@ -9,7 +9,7 @@ def count_beam_size(x_max, y_max):
     area = ''
     x_min = 0
     for y in range(y_max):
-        for x in range(x_min, x_max):       
+        for x in range(x_min, x_max): #Check only segments with '#', not whole line.      
             drone.input = [x, y]
             drone.process_intcode()
             if drone.output[-1] == 0:
@@ -29,7 +29,7 @@ def count_beam_size(x_max, y_max):
 def find_closest_point(square_side):
     last = ''
     x_min = 0
-    x_max = 3
+    x_max = 3 #From examples we can see lenghts of segments with '#' vary by 3 at most.
     for y in count(start=0):
         for x in range(x_min, x_max):   
             drone.input = [x, y]
@@ -43,9 +43,9 @@ def find_closest_point(square_side):
                 last = '.'
             else:
                 if last != '#':
-                    drone.input = [x + square_side - 1, y - square_side + 1]
+                    drone.input = [x + square_side - 1, y - square_side + 1] #Check opposing corner.
                     drone.process_intcode()
-                    if drone.output[-1] == 1:
+                    if drone.output[-1] == 1: #If both corners are '#', square fits.
                         return x * 10000 + (y - square_side + 1)
                     drone.restart()
                     x_min = x
@@ -56,5 +56,4 @@ x_max, y_max = 50, 50
 square_side = 100
 
 print('Part 1:', count_beam_size(x_max, y_max))
-#drone.restart()
 print('Part 2:', find_closest_point(square_side))

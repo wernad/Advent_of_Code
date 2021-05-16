@@ -32,6 +32,7 @@ class repairDroid(ic.IntcodeComputer):
             new_position = (self.position[0] + 1, self.position[1])                    
         return new_position
 
+    #Depth First Search. Finds oxygen_system and maps whole area.
     def dfs(self):
         backtrack = deque()
         visited = set(self.position)
@@ -68,6 +69,7 @@ class repairDroid(ic.IntcodeComputer):
             self.area.append(self.position)
         return path_length
 
+    #Breadth First Search. Fills whole area with oxygen.
     def bfs(self):
         visited = set(self.oxygen_system)
         queue = deque([self.oxygen_system])
@@ -77,14 +79,9 @@ class repairDroid(ic.IntcodeComputer):
             for position in queue:
                 x = position[0]
                 y = position[1]
-                if (x + 1, y) in self.area and (x + 1, y) not in visited:
-                    new_queue.append((x + 1, y))
-                if (x - 1, y) in self.area and (x - 1, y) not in visited:
-                    new_queue.append((x - 1, y))
-                if (x, y + 1) in self.area and (x, y + 1) not in visited:
-                    new_queue.append((x, y + 1))
-                if (x, y - 1) in self.area and (x, y - 1) not in visited:
-                    new_queue.append((x, y - 1))
+                for new_pos in [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]:
+                    if new_pos in self.area and new_pos not in visited:
+                        new_queue.append(new_pos)
                 visited.add(position)
             queue = new_queue
             if queue:

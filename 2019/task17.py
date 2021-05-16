@@ -8,7 +8,7 @@ class vacuumRobot(ic.IntcodeComputer):
         super(vacuumRobot, self).__init__(*args, **kwargs)
         self.position = None
         self.direction = 90
-        self.scaffolds = dict()
+        self.scaffolds = []
         self.path = ''
 
     def draw_area(self):
@@ -30,7 +30,7 @@ class vacuumRobot(ic.IntcodeComputer):
             if i == 46:
                 x += 1
             elif i == 35:
-                self.scaffolds[(x, y)] = ('#')
+                self.scaffolds.append((x, y))
                 x += 1
             elif i == 10:
                 y += 1
@@ -62,89 +62,80 @@ class vacuumRobot(ic.IntcodeComputer):
                 self.path += str(distance)
                 distance = 0
 
-            new_pos = tuple(sum(x) for x in zip(direction_dict[(self.direction + 90) % 360], self.position))
-            if new_pos in self.scaffolds and new_pos != last_pos:
-                self.path += 'L'
-                self.direction += 90
-                self.direction %= 360
-                continue
-
-            new_pos = tuple(sum(x) for x in zip(direction_dict[(self.direction - 90) % 360], self.position))
-            if new_pos in self.scaffolds and new_pos != last_pos:
-                self.path += 'R'
-                self.direction -= 90
-                self.direction %= 360
-                continue
-            break
+            for turn in [('L', 90), ('R', -90)]:
+                new_pos = tuple(sum(x) for x in zip(direction_dict[(self.direction + turn[1]) % 360], self.position))
+                if new_pos in self.scaffolds and new_pos != last_pos:
+                    self.path += turn[0]
+                    self.direction += turn[1]
+                    self.direction %= 360
+                    break
+            else:
+                break
         
-    def find_routine(self):
+    def path2functions(self):
         path_string = ''.join(str(x) for x in self.path)
-        main_routine = path_string
         last_pattern = ''
         current_pattern = ''
         functions = []
-        for x in range(0,3):
-            if x == 2:
-                functions.append(path_string)
-                break
-            for i in range(2,len(path_string), 2):
-                if len(current_pattern) == 0:
+        while path_string:
+            for i in range(2,len(path_string), 2):               
+                if len(re.findall(path_string[0:i], path_string)) > 1:
                     current_pattern = path_string[0:i]
-                    last_pattern = current_pattern
-                    continue
-
-                current_pattern = path_string[0:i]
-                if len(re.findall(current_pattern, path_string)) > 1:
-                    last_pattern = current_pattern
                 else:
-                    functions.append(last_pattern)
-                    path_string = path_string.replace(last_pattern, '')
-                    last_pattern = ''
-                    current_pattern = ''
+                    path_string = path_string.replace(current_pattern, '')
+                    if path_string in current_pattern:
+                        current_pattern = current_pattern.replace(path_string, '')
+                        functions.append(path_string)
+                        path_string = ''
+                    functions.append(current_pattern)
+                    current_pattern = ''                    
                     break
-        
-        #Remove duplicates between patterns.
-        functions.sort(key=lambda x: len(x))
-        for i in range(0, len(functions)-1):
-            for j in range(i+1, len(functions)):
-                if functions[i] in functions[j]:
-                    functions[j] = functions[j].replace(functions[i], '')
+
+        return functions
+
+    def create_routine(self, functions):
+        path_string = ''.join(str(x) for x in self.path)
         
         for x,y in zip(functions, ['A','B','C']):
-            main_routine = main_routine.replace(x, y)
+            path_string = path_string.replace(x, y)
+        
+        main_routine = ','.join(x for x in path_string)
+        
+        return main_routine
 
-        main_routine = ','.join(x for x in main_routine)
+#Splits steps that are higher than 9 into multiple single digit ones, e.g., L10 -> L9L1
+def simplify_functions(functions):
+    max_ASCII_num = 9
+    for k,v in enumerate(functions):
+        print(v)
+        multi_digit = set(re.findall(r'\d\d+', v))
+        for x in multi_digit:
+            new_digit = int(x)
+            replacement = ''
+            while new_digit > max_ASCII_num:
+                new_digit = new_digit - max_ASCII_num
+                replacement += str(max_ASCII_num)
+            replacement += str(new_digit)
+            functions[k] = v.replace(x, replacement)
 
-        max_ASCII_num = 9
-        for k,v in enumerate(functions):
-            multi_digit = set(re.findall(r'\d\d', v))
-            for x in multi_digit:
-                new_digit = int(x)
-                replacement = ''
-                while new_digit > max_ASCII_num:
-                    new_digit = new_digit - max_ASCII_num
-                    replacement += str(max_ASCII_num)
-                replacement += str(new_digit)
-                functions[k] = v.replace(x, replacement)
-
-        functions = [','.join(x) for x in functions]
-
-        return main_routine, functions
+    return functions    
 
 robot = vacuumRobot(puzzle_input)
 robot.process_intcode()
-#robot.draw_area()
+
 robot.find_scaffolds()
 
 intersections = []
-for i in robot.scaffolds:
-    x = i[0]
-    y = i[1]
-    if all(j in robot.scaffolds for j in [(x+1, y), (x-1, y), (x, y+1), (x, y-1)]):
-        intersections.append(i)
+for pos in robot.scaffolds:
+    x = pos[0]
+    y = pos[1]
+    if all(new_pos in robot.scaffolds for new_pos in [(x+1, y), (x-1, y), (x, y+1), (x, y-1)]):
+        intersections.append(pos)
 
 robot.generate_path()
-main_routine, functions = robot.find_routine()
+functions = robot.path2functions()
+main_routine = robot.create_routine(functions)
+functions = [','.join(x) for x in simplify_functions(functions)]
 
 puzzle_input[0] = 2
 robot.puzzle_input = puzzle_input

@@ -23,7 +23,7 @@ def calc_movement(positions, velocities, moons_comb):
     
     return positions, velocities
 
-def find_axis_period(positions, velocities, moons_comb):
+def find_axis_periods(positions, velocities, moons_comb):
     orig_positions = copy.deepcopy(positions)
     orig_velocities = copy.deepcopy(velocities)
     periods = []
@@ -49,23 +49,20 @@ def lcm(numbers):
         numbers.append((a*b)//gcd(a,b))
     return numbers[-1]
 
-
-
 positions = copy.deepcopy(puzzle_input)
 velocities = [[0]*3 for _ in range(len(positions))]
-moons_comb = list(combinations(range(len(positions)), 2))
+moons_combinations = list(combinations(range(len(positions)), 2))
 
 for i in range(1000):
-    positions, velocities = calc_movement(positions, velocities, moons_comb)
+    positions, velocities = calc_movement(positions, velocities, moons_combinations)
 
-pot = calc_energy(positions)
-kin = calc_energy(velocities)
-
-print('Part 1:', sum([a*b for a,b in zip(pot, kin)]))
+potential_energy = calc_energy(positions)
+kinetic_energy = calc_energy(velocities)
 
 positions = copy.deepcopy(puzzle_input)
 velocities = [[0]*3 for _ in range(len(positions))]
 
-periods = find_axis_period(positions, velocities, moons_comb)
+periods = find_axis_periods(positions, velocities, moons_combinations)
 
+print('Part 1:', sum([a*b for a,b in zip(potential_energy, kinetic_energy)]))
 print('Part 2:', lcm(periods))

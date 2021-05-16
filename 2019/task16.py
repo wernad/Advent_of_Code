@@ -37,5 +37,5 @@ base_pattern = [0, 1, 0, -1]
 real_signal = puzzle_input * 10000
 offset = int(''.join(map(str, puzzle_input[:7])))
 
-print('Part 1:', FFT(puzzle_input.copy()))
-print('Part 2:', FFT_offset(real_signal, offset))
+print('Part 1:', ''.join([str(x) for x in FFT(puzzle_input.copy())]))
+print('Part 2:', ''.join([ str(x) for x in FFT_offset(real_signal, offset)]))

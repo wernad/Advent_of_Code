@@ -14,16 +14,15 @@ def max_signal(puzzle_input):
             amp.input = [phase[i], last_output]
             amp.process_intcode()
             last_output = amp.output[-1]
-            amp.restart()
+            amp = ic.IntcodeComputer(puzzle_input)
         values.append(last_output)
     return max(values)
 
 def max_signal_feedback(puzzle_input):
     phases = permutations([5, 6, 7, 8, 9])
-    amps = [ic.IntcodeComputer(puzzle_input, True) for i in range(5)]
     values = []
     for phase in phases:
-        amps = [amp.restart() for amp in amps]
+        amps = [ic.IntcodeComputer(puzzle_input, True) for i in range(5)]
         last_output = 0
         for i in range(5):
             amps[i].input = [phase[i], last_output]
