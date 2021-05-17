@@ -11,6 +11,7 @@ class netComputer(ic.IntcodeComputer):
         self.name = ''
         self._lock = threading.Lock()
 
+    #Reads the oldest packet in queue. If queue is empty, takes -1 as input but only if it is not there yet.
     def read_packet(self):
         with self._lock:
             if self.incoming and not self.input:
@@ -20,6 +21,7 @@ class netComputer(ic.IntcodeComputer):
                 if self.input[-1] != -1:
                     self.input.append(-1)
 
+    #Sends a new packet. Packet is a dictionary of address and X,Y values.
     def send_packet(self):
         with self._lock:
             new_packet = dict()
@@ -35,7 +37,8 @@ class netComputer(ic.IntcodeComputer):
             new_packet['Y'] = self.output.pop(0)
         return new_packet
 
-def find_packet(computer, name):
+#Each thread runs while network's up, continuously reading and sending packets.
+def run_pc(computer, name):
     global NAT_packet
     global computers
     global network_up
@@ -49,12 +52,14 @@ def find_packet(computer, name):
             continue
 
         if new_packet['addr'] == 255:
+            #Prints first NAT packet.
             if not NAT_packet:
                 print('Part 1:', new_packet['Y'])
             NAT_packet = new_packet
         else:
             computers[new_packet['addr']].incoming.append(new_packet)
 
+#Checks if networks idle, if so, sends packet to reset network.
 def NAT():
     global NAT_packet
     global computers
@@ -67,7 +72,7 @@ def NAT():
         }
     while True:
         if not any(comp.incoming for comp in computers.values()):
-            time.sleep(3)
+            time.sleep(3) #Three seconds of no new packets means network's idle.
             if not any(comp.incoming for comp in computers.values()):
                 if last_NAT_message['Y'] == NAT_packet['Y']:
                     print('Part 2:', NAT_packet['Y'])
@@ -80,13 +85,14 @@ network_up = True
 puzzle_input = ic.load_input('23')
 NAT_packet = None
 
+#Dictionary used to read and send packets among threads.
 computers = {i: netComputer(puzzle_input, True, True) for i in range(50)}
 for addr, _ in computers.items():
     computers[addr].input = [addr, -1]
 
 threads = list()
 for i in range(50):
-    new_thread = threading.Thread(target=find_packet, args=(computers[i],i,))
+    new_thread = threading.Thread(target=run_pc, args=(computers[i],i,))
     new_thread.daemon = True
     new_thread.start()
     threads.append(new_thread)

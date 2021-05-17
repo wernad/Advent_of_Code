@@ -23,6 +23,7 @@ def shuffle(deck):
             deck = list(reversed(deck))
     return deck
 
+#Transformations in a form of linear congruential function.
 def shuffle_lcf(deck_size):
     global puzzle_input
     a,b = 1,0
@@ -41,7 +42,10 @@ def shuffle_lcf(deck_size):
         b = (new_a * b + new_b) % deck_size
     return a,b
 
-#Compose g o f
+#Title: Exponentiation by squaring
+#Author: Spheniscine
+#Date: 2019
+#Availability: https://codeforces.com/blog/entry/72527
 def pow_mod(x, n, m):
     y = 1
     while n > 0:
@@ -50,7 +54,11 @@ def pow_mod(x, n, m):
         x = x * x % m
         n //= 2
     return y
-    
+
+#Title: Modified Exponentiation by squaring
+#Author: Spheniscine
+#Date: 2019
+#Availability: https://codeforces.com/blog/entry/72593
 def pow_compose(f, k, m):
     def compose(f, g, m):
         a,b = f
